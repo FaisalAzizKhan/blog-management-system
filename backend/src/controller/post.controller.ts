@@ -1,0 +1,85 @@
+import express, {
+  type Application,
+  type Request,
+  type Response,
+} from "express";
+import { Post } from "../models/posts.models";
+import mongoose from "mongoose";
+
+export const PostController = {
+  getAllPost: async (req: Request, res: Response) => {
+    const blog_id =
+      req?.query?.blog_id || req?.params?.blog_id || req?.body?.blog_id;
+
+    const pipeline: any[] = [];
+
+    if (blog_id) {
+      pipeline.push({
+        $match: {
+          _id: new mongoose.Types.ObjectId(blog_id), 
+          
+        },
+      });
+    }
+
+    pipeline.push(
+      {
+        $lookup: {
+          from: "comments",
+          localField: "_id",
+          foreignField: "post",
+          as: "comments",
+        },
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "author",
+          foreignField: "_id",
+          as: "author",
+        },
+      },
+      { $unwind: "$author" },
+      {
+        $project: {
+          "author.password": 0,
+        },
+      },
+      {
+        $sort: { createdAt: -1 },
+      }
+    );
+
+    const posts = await Post.aggregate(pipeline);
+
+    return res.status(200).json({
+      message: "All Post",
+      data: posts,
+    });
+  },
+
+  createNew: async (req: Request, res: Response) => {
+    try {
+      const { title, content, author, status, tags, image_url }: IPost =
+        req.body;
+      const loggedin_user_id = req?.user?.loggedin_user_id;
+
+      const newPost = await Post.create({
+        title,
+        content,
+        image_url,
+        author: loggedin_user_id,
+        status,
+        tags,
+      });
+
+      return res.status(201).json({
+        message: "New Post Created Successfully",
+        data: newPost,
+      });
+    } catch (err: any) {
+      console.error(err);
+      return res.status(500).json({ message: err.message });
+    }
+  },
+};
