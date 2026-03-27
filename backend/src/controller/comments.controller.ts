@@ -4,14 +4,42 @@ import express, {
   type Response,
 } from "express";
 import { Comment } from "../models/comments.model";
+import mongoose from "mongoose";
 
 export const CommentController = {
   getAllComments: async (req: Request, res: Response) => {
-    const Comments = await Comment.find({}).exec();
+    const postId =
+      req?.query?.blog_id || req?.params?.blog_id || req?.body?.blog_id;
+
+    if (!postId) {
+      return res.status(400).json({ message: "blog_id is required" });
+    }
+
+    const comments = await Comment.aggregate([
+      {
+        $match: {
+          post: new mongoose.Types.ObjectId(postId),
+        },
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "author",
+          foreignField: "_id",
+          as: "author",
+        },
+      },
+      {
+        $unwind: "$author",
+      },
+      {
+        $sort: { createdAt: -1 },
+      },
+    ]);
 
     return res.status(200).json({
-      message: "All Comment",
-      data: Comments,
+      message: "All Comments",
+      data: comments,
     });
   },
 
