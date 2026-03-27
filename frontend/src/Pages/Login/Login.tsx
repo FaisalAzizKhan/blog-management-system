@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-import { FaGithubAlt } from "react-icons/fa";
+// import { FaGithubAlt } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { loginPageValidationSchema } from "../../Utiles/ValidationSchema/schema/LoginPage";
+// import { loginPageValidationSchema } from "../../Utiles/ValidationSchema/schema/LoginPage";
 import { useTenStackMutation } from "../../Services/TenstackQuery/Mutations";
-import { validateForm } from "../../Utiles/ValidationSchema/method/validate";
+// import { validateForm } from "../../Utiles/ValidationSchema/method/validate";
 
 import { BackendEndpoints } from "../../Services/Urls/Urls";
 import { HTTPAxiosMethod } from "../../Types/Enums/Methods";
@@ -15,7 +15,7 @@ import CustomInput from "../../Utiles/CustomInput/CustomInput";
 
 const LoginPage = () => {
   const navigate = useNavigate();
-  const [errors, setErrors] = useState<any>();
+  const [errors, _] = useState<any>();
 
   document.title = "Login";
 
@@ -34,13 +34,13 @@ const LoginPage = () => {
     console.log(formData);
 
     try {
-      const isValid = validateForm(
-        formData,
-        loginPageValidationSchema,
-        setErrors
-      );
+      // const isValid = validateForm(
+      //   formData,
+      //   loginPageValidationSchema,
+      //   setErrors
+      // );
 
-      if (!isValid) return;
+      // if (!isValid) return;
 
       await userlogin(formData, {
         onSuccess: (data: any) => {

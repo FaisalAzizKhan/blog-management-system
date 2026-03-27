@@ -7,7 +7,7 @@
     "dev": "vite",
     "start": "vite",
     "development": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && vite build --mode development",
     "lint": "eslint .",
     "preview": "vite preview"
   },
